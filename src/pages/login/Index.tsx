@@ -1,5 +1,6 @@
-﻿import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, type FormEvent } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { getDemoUser, loginDemo, roleHome } from '@/data/access-profiles'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,8 +11,15 @@ export default function Login() {
   const [message, setMessage] = useState('')
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    navigate('/dashboard')
+    const form = new FormData(event.currentTarget)
+    try {
+      const user = loginDemo(String(form.get('email') ?? ''), String(form.get('password') ?? ''))
+      if (!user) { setMessage('E-mail ou senha de demonstração incorretos.'); return }
+      navigate(roleHome[user.role], { replace: true })
+    } catch { setMessage('Não foi possível salvar a sessão. Habilite o armazenamento do navegador e tente novamente.') }
   }
+  const currentUser = getDemoUser()
+  if (currentUser) return <Navigate to={roleHome[currentUser.role]} replace />
   return (
     <main className="min-h-screen bg-[#f7f9f8] text-slate-900 selection:bg-emerald-200">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
@@ -27,7 +35,7 @@ export default function Login() {
             <h1 className="text-5xl font-semibold leading-[1.12] tracking-tight xl:text-6xl">Conecte pessoas.<br />Resolva desafios.<br /><span className="text-emerald-300">Transforme serviços.</span></h1>
             <p className="mt-7 max-w-sm text-base leading-7 text-emerald-50/75">Um só lugar para organizar chamados, acompanhar missões e cuidar de quem precisa do serviço público.</p>
             <div className="mt-10 space-y-4 border-t border-white/15 pt-7">
-              {['Atendimento com apoio de inteligência artificial', 'Equipes conectadas durante a execução', 'Cada contribuição reconhecida'].map((text) => (
+              {['Chamados organizados em um só lugar', 'Equipes conectadas durante a execução', 'Cada contribuição reconhecida'].map((text) => (
                 <div key={text} className="flex items-center gap-3 text-sm text-emerald-50/90"><span aria-hidden="true" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-300/15 text-emerald-200">✓</span>{text}</div>
               ))}
             </div>
@@ -48,7 +56,7 @@ export default function Login() {
                 <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Bem-vindo de volta</h2>
                 <p className="text-base leading-6 text-slate-600">Acesse sua conta para acompanhar seus chamados e missões.</p>
               </div>
-              <p className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">Modo demonstração: use qualquer e-mail válido e uma senha para explorar a plataforma.</p>
+              <p className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">Modo demonstração: entre com uma das contas de usuário, técnico ou administrador listadas em perfis-de-acesso.md.</p>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2"><Label htmlFor="email">E-mail institucional</Label><Input id="email" name="email" type="email" autoComplete="username" placeholder="voce@sjp.pr.gov.br" required maxLength={254} className="h-12 rounded-lg bg-white px-4 focus-visible:ring-emerald-700" onChange={() => setMessage('')} /></div>
                 <div className="space-y-2">

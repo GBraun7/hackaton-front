@@ -1,8 +1,31 @@
-﻿export const ticketStatuses = ['Aberto', 'Em andamento', 'Bloqueado', 'Aguardando validação', 'Resolvido'] as const
+import type { TicketNotice } from '@/data/notification-rules'
+export const ticketStatuses = ['Aberto', 'Vinculado', 'Em andamento', 'Pausado', 'Bloqueado', 'Aguardando validação', 'Aguardando análise', 'Resolvido'] as const
 export type TicketStatus = typeof ticketStatuses[number]
 export type Priority = 'Baixa' | 'Normal' | 'Alta'
 export interface Ticket {
+  positions?: import('@/data/mock-positions').MockPosition[]
+  proximityInvitees?: string[]
+  notices?: TicketNotice[]
   id: number
+  demoSeedKey?: string
+  technicianId?: string
+  startedAt?: string
+  validations?: { at: string; authorId: string; author: string; result: 'confirmado' | 'pendencia'; rating?: number; text: string }[]
+  review?: { requestedAt: string; reason: string; reviewedAt?: string; reviewedBy?: string; response?: string } | null
+  resolvedAt?: string
+  completedAt?: string
+  pauseReason?: string | null
+  intervals?: { startedAt: string; endedAt: string | null }[]
+  requesterId?: string
+  authorId?: string
+  callType?: string
+  area?: string
+  nature?: 'Hardware' | 'Software'
+  modality?: 'Presencial' | 'Remoto'
+  impact?: string
+  urgency?: string
+  material?: string
+  pickupLocation?: string
   title: string
   description: string
   createdAt: string
@@ -54,9 +77,69 @@ export const mockTickets: Ticket[] = samples.map((sample, index) => {
 })
 export const statusClasses: Record<TicketStatus, string> = {
   'Aberto': 'border-slate-200 bg-slate-100 text-slate-700',
+  'Vinculado': 'border-cyan-200 bg-cyan-50 text-cyan-800',
+  'Pausado': 'border-orange-200 bg-orange-50 text-orange-900',
   'Em andamento': 'border-blue-200 bg-blue-50 text-blue-800',
   'Bloqueado': 'border-amber-200 bg-amber-50 text-amber-900',
   'Aguardando validação': 'border-violet-200 bg-violet-50 text-violet-800',
+  'Aguardando análise': 'border-rose-200 bg-rose-50 text-rose-800',
   'Resolvido': 'border-emerald-200 bg-emerald-50 text-emerald-800',
 }
 export const priorityClasses: Record<Priority, string> = { Baixa: 'border-slate-200 bg-white text-slate-600', Normal: 'border-slate-200 bg-white text-slate-600', Alta: 'border-rose-200 bg-rose-50 text-rose-800' }
+
+// Exemplos adicionais com fila e pausa, sem execução ativa extra.
+export const additionalDemoTickets: Ticket[] = [
+  { key: 'vinculado-painel', title: 'Instalação de painel na recepção', status: 'Vinculado' as const, location: 'Hospital Municipal (demonstração)', reason: null },
+  { key: 'vinculado-software', title: 'Configuração de software de atendimento', status: 'Vinculado' as const, location: 'Unidade de Saúde Borda do Campo', reason: null },
+  { key: 'pausado-intervalo', title: 'Verificação de impressora da recepção', status: 'Pausado' as const, location: 'Hospital Municipal (demonstração)', reason: 'Intervalo: atendimento interrompido para intervalo do técnico; retomar a verificação da impressora.' },
+  { key: 'pausado-material', title: 'Substituição de cabo HDMI do painel', status: 'Pausado' as const, location: 'Unidade de Saúde Borda do Campo', reason: 'Aguardando material / terceiros: aguardando liberação do cabo HDMI no estoque para continuar a instalação.' },
+].map((sample, index): Ticket => {
+  const createdAt = '2026-10-09T08:00:00-03:00'
+  const assignedAt = '2026-10-09T08:15:00-03:00'
+  const startedAt = '2026-10-09T08:30:00-03:00'
+  const pausedAt = '2026-10-09T09:00:00-03:00'
+  const paused = sample.status === 'Pausado'
+  return {
+    id: 14201 + index, demoSeedKey: sample.key,
+    title: sample.title, description: `${sample.title}. Exemplo fictício para consultar a ordem de serviço e testar ${paused ? 'a retomada do atendimento' : 'a fila do técnico'}.`,
+    createdAt, requester: 'Ana Silva', requesterId: 'usuario-demo', authorId: 'usuario-demo',
+    extension: '0000 (fictício)', secretary: 'Saúde', department: 'Departamento Regional de Saúde', location: sample.location,
+    team: 'Suporte', area: 'Suporte', category: index === 1 ? 'Software' : 'Hardware', nature: index === 1 ? 'Software' : 'Hardware', modality: index === 1 ? 'Remoto' : 'Presencial',
+    technician: 'Camila Santos', technicianId: 'tecnico-demo', status: sample.status, priority: 'Normal', equipment: null, blocker: null,
+    pauseReason: sample.reason, intervals: paused ? [{ startedAt, endedAt: pausedAt }] : [],
+    ...(paused ? { startedAt } : {}),
+    history: [
+      { at: createdAt, author: 'Ana Silva', text: 'Chamado de demonstração cadastrado para atendimento na Saúde.' },
+      { at: assignedAt, author: 'Camila Santos', text: 'Chamado assumido e incluído na fila. Atendimento ainda não iniciado.' },
+      ...(paused ? [{ at: startedAt, author: 'Camila Santos', text: 'Atendimento iniciado.' }, { at: pausedAt, author: 'Camila Santos', text: `Atendimento pausado — ${sample.reason}` }] : []),
+    ],
+  }
+})
+additionalDemoTickets.push(...[
+  { key: 'analise-impressora', title: 'Impressora continua com falha após atendimento', reason: 'A impressora voltou a travar ao emitir documentos. O problema continua mesmo após a limpeza realizada.', delivery: 'Limpeza da bandeja e teste de impressão realizados.', nature: 'Hardware' as const, location: 'Hospital Municipal (demonstração)' },
+  { key: 'analise-software', title: 'Sistema de atendimento ainda não permite acesso', reason: 'O acesso foi liberado, mas o sistema continua exibindo erro ao abrir o cadastro de pacientes.', delivery: 'Permissões de acesso revisadas e sessão do sistema testada.', nature: 'Software' as const, location: 'Unidade de Saúde Borda do Campo' },
+].map((sample, index): Ticket => {
+  const createdAt = '2026-10-09T08:00:00-03:00'
+  const assignedAt = '2026-10-09T08:15:00-03:00'
+  const startedAt = '2026-10-09T08:30:00-03:00'
+  const completedAt = '2026-10-09T09:00:00-03:00'
+  const requestedAt = '2026-10-09T09:15:00-03:00'
+  return {
+    id: 14205 + index, demoSeedKey: sample.key,
+    title: sample.title, description: `${sample.title}. Exemplo fictício de retorno para análise administrativa.`,
+    createdAt, startedAt, completedAt, requester: 'Ana Silva', requesterId: 'usuario-demo', authorId: 'usuario-demo',
+    extension: '0000 (fictício)', secretary: 'Saúde', department: 'Departamento Regional de Saúde', location: sample.location,
+    team: 'Suporte', area: 'Suporte', category: sample.nature, nature: sample.nature, modality: sample.nature === 'Software' ? 'Remoto' : 'Presencial',
+    technician: 'Camila Santos', technicianId: 'tecnico-demo', status: 'Aguardando análise', priority: 'Normal', equipment: null, blocker: null,
+    intervals: [{ startedAt, endedAt: completedAt }],
+    review: { requestedAt, reason: sample.reason },
+    validations: [{ at: requestedAt, authorId: 'usuario-demo', author: 'Ana Silva', result: 'pendencia', text: sample.reason }],
+    history: [
+      { at: createdAt, author: 'Ana Silva', text: 'Chamado de demonstração cadastrado para atendimento na Saúde.' },
+      { at: assignedAt, author: 'Camila Santos', text: 'Chamado assumido e incluído na fila.' },
+      { at: startedAt, author: 'Camila Santos', text: 'Atendimento iniciado.' },
+      { at: completedAt, author: 'Camila Santos', text: `Serviço concluído pelo técnico: ${sample.delivery} Aguardando confirmação do solicitante.` },
+      { at: requestedAt, author: 'Ana Silva', text: `Solicitante informou pendência: ${sample.reason} Encaminhado para análise do administrador.` },
+    ],
+  }
+}))
