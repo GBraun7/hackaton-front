@@ -24,7 +24,7 @@ export default function Notifications() {
   function canRead(ticket: typeof tickets[number]) {
     if (user!.role === 'administrador') return true
     if (user!.role === 'usuario') return ticket.requesterId ? ticket.requesterId === user!.id : ticket.requester === user!.name
-    return isAssignedTo(ticket, user!) || (ticket.status === 'Aberto' && ((user!.secretaries ?? [user!.secretary]).includes(ticket.secretary) || Boolean(ticket.proximityInvitees?.includes(user!.id))) && Boolean(user!.callTypes?.includes(ticket.callType ?? ticket.team)))
+    return isAssignedTo(ticket, user!) || (ticket.executionState === 'Aberto' && ((user!.secretaries ?? [user!.secretary]).includes(ticket.secretary) || Boolean(ticket.proximityInvitees?.includes(user!.id))) && Boolean(user!.callTypes?.includes(ticket.callType ?? ticket.team)))
   }
   const selected = tickets.find(ticket => ticket.id === selectedId && canRead(ticket))
   function mark(ids: string[]) { try { markNoticesRead(ids); setActionError(''); return true } catch (cause) { setActionError(cause instanceof Error ? cause.message : 'Não foi possível atualizar.'); return false } }

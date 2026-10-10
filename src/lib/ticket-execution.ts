@@ -9,7 +9,7 @@ export function executionIntervals(ticket: Ticket): NonNullable<Ticket['interval
   // Compatibilidade com os exemplos anteriores, sem apagar seus eventos.
   const start = ticket.history.find(entry => entry.text === 'Atendimento iniciado.')?.at
   if (!start) return []
-  const end = ticket.status === 'Em andamento' ? null : ticket.history.find(entry => entry.at >= start && (entry.text.includes('Serviço concluído') || entry.text === ticket.blocker))?.at ?? start
+  const end = ticket.executionState === 'Em andamento' ? null : ticket.history.find(entry => entry.at >= start && (entry.text.includes('Serviço concluído') || entry.text === ticket.blocker))?.at ?? start
   return [{ startedAt: start, endedAt: end }]
 }
 export function activeSeconds(ticket: Ticket, now = Date.now()) {

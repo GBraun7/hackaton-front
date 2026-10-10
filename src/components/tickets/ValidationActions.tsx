@@ -15,8 +15,8 @@ export default function ValidationActions({ ticket }: { ticket: Ticket }) {
   const pending = useRef(false)
   if (!user) return null
   const owner = ticket.requesterId ? ticket.requesterId === user.id : ticket.requester === user.name
-  const canValidate = owner && user.role !== 'tecnico' && ticket.status === 'Aguardando validação'
-  const canReview = user.role === 'administrador' && ticket.status === 'Aguardando análise'
+  const canValidate = owner && user.role !== 'tecnico' && ticket.executionState === 'Aguardando validação'
+  const canReview = user.role === 'administrador' && ticket.executionState === 'Aguardando análise'
   if (!canValidate && !canReview && !message) return null
   function choose(selected: ValidationInput['action']) { setAction(selected); setText(''); setRating(''); setError(''); setMessage('') }
   async function submit(event: FormEvent<HTMLFormElement>) {

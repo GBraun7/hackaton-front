@@ -16,7 +16,7 @@ Veja [perfis-de-acesso.md](./perfis-de-acesso.md) para credenciais, rotas e perm
 - [x] Dashboard com contadores, gráfico, períodos de 7/30 dias, busca e filtros locais.
 - [x] Chamados em Kanban e tabela, busca sem acentos, filtro por equipe/prioridade e ordenação por número.
 - [x] Modal da ordem de serviço com solicitante, unidade, equipe, técnico, equipamento, impedimentos e histórico fictício.
-- [x] Estados visuais: Aberto, Em andamento, Bloqueado, Aguardando validação e Resolvido.
+- [x] Status dos chamados: Em aberto, Em análise e Resolvido. Etapas operacionais aparecem nos detalhes do atendimento.
 - [x] Mapa Leaflet com destino, trajeto, posição e distância simulados; aviso quando o fundo não carrega.
 - [x] Componentes locais Button, Input, Label, Dialog e componentes de dashboard.
 - [x] Cliente Axios preparado para `VITE_API_URL`, ainda sem consumo pelas páginas.
@@ -414,3 +414,10 @@ Estado: mapa administrativo e convites por proximidade entregues com mocks. Coop
 - [ ] Entregas posteriores: perfil/foto → evidências → ranking e pontos.
 
 Build desta retomada: aprovado; permanece o aviso de bundle acima de 500 kB. Preservadas as alterações locais preexistentes. GPS, push, segundo plano e integração com backend continuam futuros.
+
+
+## Status do chamado — atualização de 09/10/2026
+
+Catálogo vigente: **Em aberto, Em análise e Resolvido**. Cadastro → Em aberto; assumir/atribuir → Em análise; confirmar pelo solicitante → Resolvido. Execução, pausa/bloqueio, espera de validação e análise administrativa são etapas internas do atendimento, separadas em executionState. Conclusão do técnico mantém Em análise até a confirmação. Kanban tem três colunas e filtros de status usam somente esse catálogo.
+
+Dados locais antigos são migrados preservando a etapa original, histórico, intervalos, responsáveis e avisos. Referências anteriores aos oito estados são históricas ou descrevem etapas de atendimento. Regras completas na seção 11 do plano. Validação desta mudança: lint, build e npm run check:statuses aprovados (migração dos oito estados, recarga, dados inválidos/falha de gravação, permissões, uma execução ativa, pausa/bloqueio, posições, conclusão, pendência, devolução e confirmação). Verificação visual em navegador/celular permanece pendente; build mantém aviso de bundle acima de 500 kB.

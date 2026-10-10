@@ -35,7 +35,7 @@ export function latestPosition(id: string, tickets: Ticket[]) {
 }
 export function recordDemoPosition(ticket: Ticket, now = Date.now()): Ticket {
   const target = unitPositions[ticket.location]
-  if (!target || !ticket.technicianId || ticket.modality === 'Remoto' || ticket.status !== 'Em andamento') return ticket
+  if (!target || !ticket.technicianId || ticket.modality === 'Remoto' || ticket.executionState !== 'Em andamento') return ticket
   const interval = executionIntervals(ticket).find(item => item.endedAt === null)
   if (!interval) return ticket
   const positions = ticket.positions ?? []

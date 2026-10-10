@@ -27,15 +27,15 @@ function routeFor(ticket: Ticket): GeoPoint[] {
 export function getTrackingSnapshot(ticket: Ticket, now = Date.now()): TrackingSnapshot {
   const route = routeFor(ticket)
   const destination = route[route.length - 1]
-  if (ticket.status === 'Aberto') return { destination, points: [], mode: 'none', finishedAt: null, arrived: false }
-  if (ticket.status === 'Em andamento') {
+  if (ticket.executionState === 'Aberto') return { destination, points: [], mode: 'none', finishedAt: null, arrived: false }
+  if (ticket.executionState === 'Em andamento') {
     if (!liveSessions.has(ticket.id)) liveSessions.set(ticket.id, now - 15_000)
     const start = liveSessions.get(ticket.id)!
     const count = Math.min(route.length, Math.max(1, Math.floor((now - start) / 5000) + 1))
     return { destination, points: route.slice(0, count).map((point, index) => ({ ...point, recordedAt: new Date(start + index * 5000).toISOString() })), mode: 'live', finishedAt: null, arrived: count === route.length }
   }
   const startedAt = new Date(ticket.createdAt.replace('09:30', '10:15')).getTime()
-  const complete = ticket.status === 'Resolvido' || ticket.status === 'Aguardando validação'
+  const complete = ticket.executionState === 'Resolvido' || ticket.executionState === 'Aguardando validação'
   const points = route.slice(0, complete ? route.length : 7).map((point, index) => ({ ...point, recordedAt: new Date(startedAt + index * 5 * 60_000).toISOString() }))
   return { destination, points, mode: 'history', finishedAt: complete ? points[points.length - 1].recordedAt : null, arrived: complete }
 }

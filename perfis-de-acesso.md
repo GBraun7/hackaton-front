@@ -66,3 +66,7 @@ Na ordem de serviço, administrador atribui ou transfere com justificativa. Cand
 Todas as contas têm Notificações e atalho Avisos com contador de não lidas. Cada conta consulta/marca somente seus avisos. Usuário recebe conclusão; administrador recebe pendência; técnico recebe abertura da secretaria/tipo, vínculo e devolução. Técnicos novos usam os vínculos cadastrados para receber eventos futuros.
 
 Para testar, gerar novo chamado e alternar entre contas no mesmo navegador. Avisos/leitura persistem após logout; exemplos antigos não recebem avisos retroativos. Clicar abre a ordem apenas se o perfil ainda tiver autorização. A central é simulada: não envia push para celular ou outro dispositivo.
+
+## Status atuais do chamado
+
+Somente Em aberto, Em análise e Resolvido. A execução e a validação seguem etapas internas; concluir pelo técnico mantém Em análise e confirmar pelo solicitante marca Resolvido. Filtros de chamados usam os três status; ações continuam respeitando papel, responsabilidade e etapa interna.

@@ -1,6 +1,6 @@
 ﻿# Regras de negócio e plano de implementação — Missão SJP
 
-Análise inicial e consolidação: 09/10/2026. Documento compartilhado de regras para **backend, frontend web e aplicativo mobile**, mantido em `Hackaton_frontend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md`. Estado do frontend conferido no código do commit `f8a63e5`.
+Análise inicial e consolidação: 09/10/2026. Documento compartilhado de regras para **backend, frontend web e aplicativo mobile**, mantido em `Hackaton_frontend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md`. Base do frontend: commit `f8a63e5`; simplificação dos status aplicada após `fd74597`, conforme seção 11.
 
 ## 1. Escopo e diagnóstico
 
@@ -86,7 +86,7 @@ Prioridade e pontos devem seguir regra configurada, sem permitir que o solicitan
 
 ### Vínculo, execução, pausa e tempo
 
-Fluxo vigente: **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado → Aguardando validação → Resolvido**. Bloqueado interrompe execução e registra impedimento. Se o solicitante informa pendência: **Aguardando validação → Aguardando análise → Vinculado** (com responsável) ou **Aberto** (sem responsável), após análise/devolução administrativa. Devolução não inicia atendimento automaticamente.
+**Status vigentes do chamado: Em aberto, Em análise e Resolvido.** Cadastro inicia Em aberto; assunção/atribuição passa para Em análise; confirmação do solicitante passa para Resolvido. Vínculo, execução, pausa, bloqueio, espera de validação e análise administrativa são etapas internas do atendimento, não novos status. O fluxo operacional permanece **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado → Aguardando validação → Resolvido**, separado do status do chamado. Bloqueado interrompe execução e registra impedimento. Se o solicitante informa pendência: **Aguardando validação → Aguardando análise → Vinculado** (com responsável) ou **Aberto** (sem responsável), após análise/devolução administrativa. Devolução não inicia atendimento automaticamente.
 
 - Vincular/aceitar não inicia automaticamente o cronômetro nem a captura; ação “Iniciar” abre sessão de execução.
 - Tela de disponíveis permite assumir chamado da responsabilidade do técnico ou oportunidade de cooperação autorizada.
@@ -95,7 +95,7 @@ Fluxo vigente: **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado →
 - Eventos incluem descrição, tipo, autor e horário, preservados após pausa, transferência, conclusão e reabertura.
 - Tempo ativo é soma dos intervalos iniciar/retomar até pausar/concluir; tempo pausado e tempo total são indicadores separados. Na operação integrada, relógio visual deve derivar dos timestamps do servidor e não zerar após fechar/reabrir o app. No mock atual, os intervalos usam o relógio do navegador e persistem após recarga.
 - Pausa exige motivo categorizado e descrição quando necessária: material/terceiros, urgência autorizada, intervalo ou fim de expediente. O motivo fica registrado para indicadores; no frontend atual nenhuma pausa altera a disponibilidade informada. Automação de disponibilidade por motivo/turno continua pendente. Pausa interrompe contagem ativa e coleta/envio de novas posições. Retomada cria novo intervalo. Dados já capturados permanecem no histórico; envio tardio deve manter timestamp original e ser identificado como histórico.
-- Conclusão encerra cronômetro/coleta e envia para Aguardando validação. A futura pontuação seguirá a política provisória/confirmada; pontos ainda não são concedidos no frontend. Resolução confirmada permanece etapa distinta.
+- Conclusão encerra cronômetro/coleta e deixa a etapa interna Aguardando validação; o status do chamado permanece Em análise. A futura pontuação seguirá a política provisória/confirmada; pontos ainda não são concedidos no frontend. Resolução confirmada permanece etapa distinta.
 
 ### Monitoramento, localização e mapa
 
@@ -251,7 +251,7 @@ Manter envio a cada 10 minutos durante execução, com interrupção na pausa e 
 
 ### Conclusão, confirmação e pontuação
 
-Conclusão do técnico encerra execução/localização e move para “Aguardando validação”. Usuário confirma ou aponta pendência. Configurar lembretes e alertar administrador quando não houver resposta; sem regra expressa, **não fechar automaticamente nem inferir satisfação**. Eventual encerramento administrativo deve ter permissão, justificativa e distinguir-se de confirmação pelo usuário.
+Conclusão do técnico encerra execução/localização e move a etapa interna para “Aguardando validação”, mantendo status Em análise. Usuário confirma ou aponta pendência. Configurar lembretes e alertar administrador quando não houver resposta; sem regra expressa, **não fechar automaticamente nem inferir satisfação**. Eventual encerramento administrativo deve ter permissão, justificativa e distinguir-se de confirmação pelo usuário.
 
 Conceder pontos provisórios únicos na conclusão e definitivos na confirmação; regra para ausência de resposta deve ser definida antes de utilizar ranking oficial. Reabertura aplica ajuste auditável, sem apagar entrega ou deduzir fraude automaticamente. Distribuição entre principal e colaboradores considera complexidade, qualidade e contribuição e deve aparecer de forma explicável. Separar saldo provisório e confirmado no ranking. Impedimentos externos e recusa voluntária não geram penalidade automática.
 
@@ -564,3 +564,24 @@ Documento movido pelo usuário para a raiz do frontend e definido como referênc
 Cooperação ainda não implementada. Tempos independentes e conclusão global pelo responsável após todos encerrarem são recomendação, não decisão aprovada. Efeito de pausa/conclusão sobre colaboradores e autorização para encerrar entrega continuam pendentes.
 
 Revisão documental baseada no código, sem mudanças de implementação e sem novos testes de aplicação. Últimas verificações registradas: lint/build e roteiro de serviços aprovados; validação visual ainda pendente. Backend/mobile não auditados. Links do README passam a apontar para o plano na mesma pasta.
+
+
+## 11. Simplificação dos status do chamado — 09/10/2026
+
+Nova instrução do usuário: chamados têm somente **Em aberto, Em análise e Resolvido**. Regra comum para backend, web e mobile. Não usar Vinculado, Em andamento, Pausado, Bloqueado, Aguardando validação ou Aguardando análise como status públicos do chamado.
+
+| Acontecimento | Status do chamado | Informação interna do atendimento |
+|---|---|---|
+| Cadastro | Em aberto | Sem responsável; aguardando assunção/atribuição |
+| Assumir/atribuir | Em análise | Vinculado à fila; tempo ainda não iniciado |
+| Iniciar/retomar | Em análise | Execução ativa; cronômetro e posição |
+| Pausar/bloquear | Em análise | Execução interrompida com motivo, sem novas posições |
+| Concluir pelo técnico | Em análise | Entrega aguardando confirmação do solicitante |
+| Solicitar análise/devolver | Em análise, ou Em aberto se devolvido sem responsável | Pendência e encaminhamento preservados no histórico |
+| Confirmar pelo solicitante | Resolvido | Entrega confirmada e avaliação registrada |
+
+Mantida a confirmação do solicitante já adotada no produto; simplificar status não elimina permissões, tempos, pausa, impedimentos ou validação. Contrato do frontend separa status de executionState (etapa interna). Backend/mobile devem manter a mesma separação e validar a coerência dos dois campos.
+
+Migração: Aberto → Em aberto; Resolvido → Resolvido; demais status antigos → Em análise. A etapa original permanece em executionState; preservar IDs, vínculos, intervalos, histórico, posições, avisos e validações. Não descartar chamados existentes nem apagar armazenamento. Kanban passa a três colunas; filtros de status e indicadores usam apenas o catálogo novo. Detalhes exibem a etapa de execução para orientar ações.
+
+Trechos anteriores com estados antigos descrevem etapas internas ou histórico de entregas e não ampliam o catálogo vigente. Cooperação, perfis/fotos, evidências e ranking seguem pendentes. Validação desta mudança: lint, build e npm run check:statuses aprovados (migração dos oito estados, recarga, dados inválidos/falha de gravação, permissões, uma execução ativa, pausa/bloqueio, posições, conclusão, pendência, devolução e confirmação). Verificação visual em navegador/celular permanece pendente; build mantém aviso de bundle acima de 500 kB.
