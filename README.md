@@ -2,7 +2,7 @@
 
 Frontend para atendimento de TI da Prefeitura, com visão web para usuário/administrador e visão mobile para técnico. O código atual implementa a jornada de atendimento com dados fictícios e persistência local; integração com backend, GPS e push reais ficam para uma etapa posterior.
 
-Este README registra o estado observado do código e os próximos passos conforme as regras de negócio definidas. Plano detalhado: [análise e regras de negócio](../ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md).
+Este README registra o estado observado do código e os próximos passos conforme as regras de negócio definidas. Plano detalhado: [análise e regras de negócio](ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md).
 
 ## Perfis de demonstração
 
@@ -29,7 +29,7 @@ Veja [perfis-de-acesso.md](./perfis-de-acesso.md) para credenciais, rotas e perm
 
 | Conceito | Regra |
 |---|---|
-| Escopo inicial | Atendimento de TI; áreas configuráveis Suporte, Telecom e TI/Sistemas, com nomenclatura final a definir |
+| Escopo inicial | Atendimento de TI; tipos vigentes Aquisição/Estoque, Suporte de TI, Redes e TI; natureza e secretaria são conceitos separados |
 | Secretaria | Responsabilidade de atendimento, por exemplo Saúde e Educação; não confundir com área técnica |
 | Natureza/modalidade | Hardware ou Software; remoto ou presencial |
 | Usuário web | Perfil, abertura e acompanhamento dos próprios chamados; confirmação/avaliação da entrega |
@@ -394,7 +394,7 @@ Validação desta etapa: lint e build aprovados; verificações de comportamento
 
 ## Próxima etapa acordada e regras de cooperação — 09/10/2026
 
-Regras e critérios de aceite registrados na [seção 9 do plano de negócio](../ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md#9-atualização-do-produto-e-próximas-entregas--09102026). Essa atualização prevalece sobre checklists históricos desta fase.
+Regras e critérios de aceite registrados na [seção 9 do plano de negócio](ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md#9-atualização-do-produto-e-próximas-entregas--09102026). Essa atualização prevalece sobre checklists históricos desta fase.
 
 Antes de avançar, validar visualmente mapa e convites em desktop/celular. Próxima entrega: oferecer ajuda em chamado já assumido, obter aprovação do responsável/administrador e vincular colaborador sem substituir responsável ou secretaria. Cada participante terá eventos e tempo próprios; uma execução ativa por técnico, inclusive como colaborador. Oferta/vínculo não inicia atendimento. Recusa voluntária não gera penalidade automática. Preservar histórico, acesso por papel, persistência e separação entre conclusão e validação. Efeito da pausa/conclusão do responsável sobre colaboradores deve ser definido antes das transições.
 
