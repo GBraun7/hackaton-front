@@ -1,6 +1,6 @@
 ﻿# Regras de negócio e plano de implementação — Missão SJP
 
-Análise inicial e consolidação: 09/10/2026. Documento compartilhado de regras para **backend, frontend web e aplicativo mobile**, mantido em `Hackaton_frontend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md`. Base do frontend: commit `f8a63e5`; simplificação dos status aplicada após `fd74597`, conforme seção 11.
+Análise inicial e consolidação: 09/10/2026. Documento compartilhado de regras para **backend, frontend web e aplicativo mobile**, mantido em `Hackaton_frontend/ANALISE_FRONTEND_E_PLANO_DE_IMPLEMENTACAO.md`. Estado do frontend conferido no código do commit `f8a63e5`.
 
 ## 1. Escopo e diagnóstico
 
@@ -35,7 +35,7 @@ Referência histórica: manual, páginas 21–23. Esta avaliação é do fronten
 | Integração bidirecional | Não demonstrada pelo frontend | Origem/ID externo, entrada/saída, deduplicação e recuperação com legado |
 | Web/mobile com push | Jornada responsiva e central local | Aplicativo validado em aparelho, push e captura em segundo plano |
 | Rastreabilidade, validação e acesso | Histórico, intervalos, validação/avaliação e guardas demonstrativos | Autorização no servidor, persistência operacional, evidências e auditoria |
-| Gamificação configurável | Não implementada | Pontos provisórios/confirmados, regras, rankings e períodos preservando histórico |
+| Ranking de técnicos | Não implementado | Pontos por dificuldade/prioridade e classificação por total acumulado na web e no app |
 | IA demonstrável | Não implementada | Auxílio útil e revisável, conforme passo 10; implantação compatível |
 | Hospedagem municipal/código-fonte | Build e instruções do frontend disponíveis | Documentação integrada, infraestrutura, dependências/licenças/custos e tiles do mapa |
 
@@ -56,13 +56,13 @@ Esta seção consolida as regras de negócio atuais para backend, web e mobile. 
 
 ### Classificação: tipo de chamado, natureza e local
 
-- **Tipo de chamado:** catálogo vigente **Aquisição/Estoque, Suporte de TI, Redes e TI**. Classifica o serviço; não identifica equipe, técnico ou secretaria. O cadastro, filtro, ordem e distribuição do dashboard usam esse conceito.
+- **Tipo de chamado:** catálogo vigente **Novo equipamento, Suporte, Redes e Outro**. Classifica o serviço; não identifica equipe, técnico ou secretaria. O cadastro, filtro, ordem e distribuição do dashboard usam esse conceito.
 - **Natureza:** Hardware ou Software, independente do tipo. Demanda mista permanece decisão pendente.
 - **Secretaria:** órgão atendido e vínculo de responsabilidade do técnico. Um técnico pode atender várias secretarias e vários tipos.
 - **Departamento/unidade:** subdivisão e local físico da secretaria. O solicitante escolhe uma unidade autorizada, da qual vêm secretaria e departamento.
 - **Modalidade:** Presencial ou Remoto. Proximidade não é critério de convite em atendimento remoto.
 
-Nomenclaturas anteriores são históricas. Migração do frontend: Suporte → Suporte de TI; Telecom → Redes; TI / Sistemas → TI; Aquisições / Estoque → Aquisição/Estoque. Campo vigente: `callType`; `area`/`team` permanecem compatíveis nesta fase, sem representar membros de equipe. Normalizar sem perder IDs, estado ou histórico. Todas as quatro opções aparecem no filtro mesmo sem chamados do tipo.
+Nomenclaturas anteriores são históricas. Os tipos vigentes são Novo equipamento, Suporte, Redes e Outro. Campo vigente: `callType`; `area`/`team` permanecem compatíveis nesta fase, sem representar membros de equipe. Normalizar os registros antigos para o catálogo novo sem perder IDs, estado ou histórico. Todas as quatro opções aparecem no filtro mesmo sem chamados do tipo.
 
 Secretarias/unidades atuais são fictícias: Saúde, Educação, Administração e Cultura. Não representam lista oficial municipal. Catálogos operacionais devem ser configuráveis, com IDs e coordenadas válidas para unidades presenciais; cadastros desses catálogos ainda não foram entregues no frontend.
 
@@ -80,13 +80,13 @@ As permissões devem ser aplicadas no backend. Pertencer a outra secretaria não
 
 ### Cadastro do chamado
 
-Campos: descrição; impacto no serviço (pessoas/unidades afetadas e existência de alternativa); urgência informada; contato disponível; necessidade de material/equipamento e local de retirada quando conhecidos; solicitante (usuário); secretaria; departamento; unidade/local e coordenadas para atendimento presencial; tipo de chamado; Hardware/Software; atendimento remoto/presencial; equipamento quando pertinente; prioridade; pontos previstos; identificadores de origem quando integrado. Usuário autenticado é solicitante por padrão; administrador pode abrir para outra pessoa, registrando autor e solicitante separadamente.
+Campos: descrição; impacto no serviço (pessoas/unidades afetadas e existência de alternativa); urgência informada; dificuldade (Fácil, Médio ou Difícil); contato disponível; necessidade de material/equipamento e local de retirada quando conhecidos; solicitante (usuário); secretaria; departamento; unidade/local e coordenadas para atendimento presencial; tipo de chamado; Hardware/Software; atendimento remoto/presencial; equipamento quando pertinente; prioridade; pontos calculados pela regra; identificadores de origem quando integrado. Usuário autenticado é solicitante por padrão; administrador pode abrir para outra pessoa, registrando autor e solicitante separadamente.
 
 Prioridade e pontos devem seguir regra configurada, sem permitir que o solicitante manipule livremente pontuação ou prioridade alta. Um chamado de software pode não ter equipamento físico. Local deve apontar para unidade cadastrada, evitando distância calculada a partir de nome em texto.
 
 ### Vínculo, execução, pausa e tempo
 
-**Status vigentes do chamado: Em aberto, Em análise e Resolvido.** Cadastro inicia Em aberto; assunção/atribuição passa para Em análise; confirmação do solicitante passa para Resolvido. Vínculo, execução, pausa, bloqueio, espera de validação e análise administrativa são etapas internas do atendimento, não novos status. O fluxo operacional permanece **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado → Aguardando validação → Resolvido**, separado do status do chamado. Bloqueado interrompe execução e registra impedimento. Se o solicitante informa pendência: **Aguardando validação → Aguardando análise → Vinculado** (com responsável) ou **Aberto** (sem responsável), após análise/devolução administrativa. Devolução não inicia atendimento automaticamente.
+Fluxo vigente: **Aberto → Vinculado → Em andamento ↔ Pausado/Bloqueado → Aguardando validação → Resolvido**. Bloqueado interrompe execução e registra impedimento. Se o solicitante informa pendência: **Aguardando validação → Aguardando análise → Vinculado** (com responsável) ou **Aberto** (sem responsável), após análise/devolução administrativa. Devolução não inicia atendimento automaticamente.
 
 - Vincular/aceitar não inicia automaticamente o cronômetro nem a captura; ação “Iniciar” abre sessão de execução.
 - Tela de disponíveis permite assumir chamado da responsabilidade do técnico ou oportunidade de cooperação autorizada.
@@ -95,7 +95,7 @@ Prioridade e pontos devem seguir regra configurada, sem permitir que o solicitan
 - Eventos incluem descrição, tipo, autor e horário, preservados após pausa, transferência, conclusão e reabertura.
 - Tempo ativo é soma dos intervalos iniciar/retomar até pausar/concluir; tempo pausado e tempo total são indicadores separados. Na operação integrada, relógio visual deve derivar dos timestamps do servidor e não zerar após fechar/reabrir o app. No mock atual, os intervalos usam o relógio do navegador e persistem após recarga.
 - Pausa exige motivo categorizado e descrição quando necessária: material/terceiros, urgência autorizada, intervalo ou fim de expediente. O motivo fica registrado para indicadores; no frontend atual nenhuma pausa altera a disponibilidade informada. Automação de disponibilidade por motivo/turno continua pendente. Pausa interrompe contagem ativa e coleta/envio de novas posições. Retomada cria novo intervalo. Dados já capturados permanecem no histórico; envio tardio deve manter timestamp original e ser identificado como histórico.
-- Conclusão encerra cronômetro/coleta e deixa a etapa interna Aguardando validação; o status do chamado permanece Em análise. A futura pontuação seguirá a política provisória/confirmada; pontos ainda não são concedidos no frontend. Resolução confirmada permanece etapa distinta.
+- Conclusão encerra cronômetro/coleta e envia para Aguardando validação. O técnico responsável pela conclusão recebe pontos uma única vez conforme dificuldade e prioridade: Fácil = 5, Médio = 10, Difícil = 15; prioridade Alta acrescenta 10 pontos. Resolução confirmada permanece etapa distinta.
 
 ### Monitoramento, localização e mapa
 
@@ -146,16 +146,18 @@ Se houver retirada de equipamento/material, registrar necessidade e local de ret
 
 ### Pontuação e ranking
 
-Cada chamado tem pontos previstos segundo regras configuradas; técnico recebe crédito ao concluir. Para conciliar com qualidade e confirmação exigidas pelo manual, adota-se crédito provisório na conclusão e definitivo na confirmação, com ajuste auditável em reabertura. Essa política passa a ser adotada nesta revisão; pesos, divisão de crédito e tratamento da ausência de resposta ainda devem ser configurados. Repetir conclusão, retransmitir evento ou transferir chamado não duplica pontos. Cooperação deve registrar contribuição e regra de divisão/bonificação explícita; não penalizar recusa voluntária nem pausa por dependência externa. Ranking individual e por equipe, períodos e histórico permanecem requisitos do manual.
+Ao concluir um chamado, o técnico executor recebe pontos conforme a dificuldade registrada: **Fácil = 5**, **Médio = 10** e **Difícil = 15**. Se a prioridade do chamado for **Alta**, acrescentam-se **10 pontos** ao crédito daquele chamado. Assim, os totais possíveis por chamado são 5/10/15 para prioridade diferente de Alta e 15/20/25 para prioridade Alta. O total do técnico é a soma dos pontos recebidos pelos chamados concluídos. Cada conclusão pontua uma única vez; repetição de evento, retransmissão ou reabertura não duplica o crédito. A dificuldade deve estar definida no chamado e não pode ser alterada pelo técnico para elevar sua pontuação sem registro autorizado.
+
+A aplicação web e o app exibem o ranking de técnicos com nome e total acumulado de pontos, em ordem decrescente. O cálculo e o histórico devem ser compartilhados entre os canais e persistidos; empate permanece empatado (sem critério adicional de desempate definido). A regra solicitada concede os pontos na conclusão do técnico, sem aguardar confirmação do solicitante. Em chamados com colaboradores, atribuição/divisão dos pontos ainda precisa de decisão antes de pontuar mais de um participante.
 
 ### Decisões pendentes sem bloquear a documentação
 
-- Catálogo operacional configurável de tipos/competências e tratamento de Hardware/Software misto. A nomenclatura atual já está definida: Aquisição/Estoque, Suporte de TI, Redes e TI.
+- Catálogo operacional configurável de tipos/competências e tratamento de Hardware/Software misto. Tipos vigentes: Novo equipamento, Suporte, Redes e Outro.
 - Raio de proximidade, idade/precisão máxima do GPS e política de turno/fora do expediente.
 - Monitoramento fora do atendimento, pois conflita com pausa interrompendo captura.
 - Limite de chamados vinculados em fila e procedimento de aprovação da colaboração; uma execução ativa por técnico e oferta de ajuda sem troca de responsável já são regras adotadas.
 - Prazos/escalonamento de prioridade alta e atribuição automática versus decisão do administrador.
-- Matriz de impacto/urgência, pesos de pontuação, divisão/bonificação de colaboração e tratamento de ausência de confirmação; confirmação definitiva e ajustes auditáveis na reabertura já são regras adotadas.
+- Matriz de impacto/urgência, definição/autorização da dificuldade, desempate do ranking e divisão de pontos em chamados com colaboradores.
 - Formato do app após validar GPS em segundo plano; ponto/local de retirada de equipamento.
 
 ## 4B. Regras aplicadas no frontend e responsabilidades das outras camadas
@@ -251,9 +253,9 @@ Manter envio a cada 10 minutos durante execução, com interrupção na pausa e 
 
 ### Conclusão, confirmação e pontuação
 
-Conclusão do técnico encerra execução/localização e move a etapa interna para “Aguardando validação”, mantendo status Em análise. Usuário confirma ou aponta pendência. Configurar lembretes e alertar administrador quando não houver resposta; sem regra expressa, **não fechar automaticamente nem inferir satisfação**. Eventual encerramento administrativo deve ter permissão, justificativa e distinguir-se de confirmação pelo usuário.
+Conclusão do técnico encerra execução/localização e move para “Aguardando validação”. Usuário confirma ou aponta pendência. Configurar lembretes e alertar administrador quando não houver resposta; sem regra expressa, **não fechar automaticamente nem inferir satisfação**. Eventual encerramento administrativo deve ter permissão, justificativa e distinguir-se de confirmação pelo usuário.
 
-Conceder pontos provisórios únicos na conclusão e definitivos na confirmação; regra para ausência de resposta deve ser definida antes de utilizar ranking oficial. Reabertura aplica ajuste auditável, sem apagar entrega ou deduzir fraude automaticamente. Distribuição entre principal e colaboradores considera complexidade, qualidade e contribuição e deve aparecer de forma explicável. Separar saldo provisório e confirmado no ranking. Impedimentos externos e recusa voluntária não geram penalidade automática.
+Conceder na conclusão pontos únicos por chamado: Fácil 5, Médio 10, Difícil 15, com mais 10 quando a prioridade é Alta. A pontuação entra no total acumulado do técnico sem aguardar confirmação do solicitante. Reabertura não duplica pontos. Exibir nome e total em ordem decrescente no ranking compartilhado da web e do app. A dificuldade precisa estar registrada e alterações autorizadas devem ser auditadas. Atribuição de pontos em colaboração permanece pendente; até essa regra ser definida, pontua-se apenas o técnico executor responsável pela conclusão.
 
 ### Parâmetros obrigatórios antes de operar
 
@@ -274,7 +276,7 @@ Conceder pontos provisórios únicos na conclusão e definitivos na confirmaçã
 | Prioridade por impacto/urgência | Campos registrados; Normal para usuário e escolha administrativa no cadastro | Matriz configurável, alteração justificada e escalonamento |
 | Pausa categorizada | Motivos, intervalos e tempo ativo persistidos no mock | Persistência operacional e indicadores ampliados de espera/execução |
 | Confirmação sem resposta | Não implementada | Lembretes, alerta administrativo e estado pendente |
-| Crédito provisório/confirmado | Não implementado | Livro de lançamentos idempotente, ajustes e ranking separado |
+| Ranking por conclusão | Não implementado | Crédito idempotente por dificuldade/prioridade, total acumulado e exibição web/app |
 
 ## 5. Passo a passo das pendências
 
@@ -325,7 +327,7 @@ P0: jornada e infraestrutura de atendimento. P1: demais requisitos obrigatórios
 - [ ] Validar campos e impedir envio duplicado; incluir impacto, urgência, contato, necessidade de material e retirada; aplicar matriz de prioridade com alteração administrativa justificada.
 - [ ] Criar configuração mínima de setores, equipes, membros, tipos de tarefa e fluxos.
 - [ ] Permitir atribuição a pessoa ou equipe e registrar mudanças de responsável.
-- [ ] Demonstrar chamados nos tipos Aquisição/Estoque, Suporte de TI, Redes e TI, em secretarias diferentes. Preservar configuração genérica para a exigência do manual; a demonstração fora da TI permanece pendência de compatibilidade, não escopo confirmado do produto.
+- [ ] Demonstrar chamados nos tipos Novo equipamento, Suporte, Redes e Outro, em secretarias diferentes. Preservar configuração genérica para a exigência do manual; a demonstração fora da TI permanece pendência de compatibilidade, não escopo confirmado do produto.
 
 **Arquivos:** chamados, novo formulário e página de equipes/configurações; habilitar menu ao concluir funcionalidade.
 
@@ -378,17 +380,17 @@ P0: jornada e infraestrutura de atendimento. P1: demais requisitos obrigatórios
 
 **Aceite:** entrada repetida não duplica chamado; legado indisponível recebe eventos pendentes quando volta, sem perda/duplicação.
 
-### Passo 9 — Implementar gamificação configurável [P1, obrigatório]
+### Passo 9 — Implementar pontuação e ranking de técnicos [P1, obrigatório]
 
-- [ ] Criar pontos/conquistas e rankings individual e por equipe, com setor e período.
-- [ ] Configurar pesos de qualidade, complexidade e colaboração por perfil autorizado.
-- [ ] Definir pontos por chamado e exibir justificativa. Conclusão do técnico concede pontuação provisória única; confirmação torna definitiva e rejeição aplica ajuste auditável. Essa política foi adotada na revisão; pesos, divisão entre colaboradores e ausência de resposta permanecem parâmetros a definir. Cooperação entre secretarias deve ter crédito explícito sem duplicar integralmente pontos.
-- [ ] Implementar crédito provisório/confirmado separado, divisão explicável entre colaboradores e ajustes idempotentes; definir tratamento justo de impedimentos externos e evitar premiar apenas volume/velocidade.
-- [ ] Implementar períodos, inclusive mensal, com novo placar sem apagar histórico.
+- [ ] Ao concluir, conceder uma única vez ao técnico executor 5 pontos para dificuldade Fácil, 10 para Médio e 15 para Difícil; prioridade Alta acrescenta 10 pontos.
+- [ ] Somar os créditos ao total acumulado de cada técnico e exibir nome e pontos em ordem decrescente na aplicação web e no app.
+- [ ] Compartilhar o mesmo cálculo e histórico persistido entre web, app e backend; impedir duplicação em eventos repetidos e retransmissões.
+- [ ] Registrar dificuldade e prioridade usadas no cálculo e auditar alterações autorizadas de dificuldade.
+- [ ] Definir regra para distribuir pontos quando houver colaboradores antes de conceder pontos a mais de um executor. Até lá, somente o técnico executor responsável pela conclusão recebe crédito.
 
 **Dependência:** cálculo e histórico persistidos no backend.
 
-**Aceite:** regras ajustáveis alteram resultado demonstrável; novo período reinicia placar e mantém consulta ao anterior.
+**Aceite:** exemplos de cada dificuldade e da prioridade Alta resultam nos valores previstos; conclusão repetida não duplica crédito; web e app exibem os mesmos nomes e totais em ordem decrescente.
 
 ### Passo 10 — Integrar aplicação útil de IA [P1, obrigatório no manual; fora da interface nesta fase]
 
@@ -452,7 +454,7 @@ Decisão atual do produto: assistente de IA retirado dos menus desktop/mobile e 
 1. Contratos, sessão e dados comuns: passos 1–3.
 2. Cadastro, atribuição/aceite, execução, cronômetro, localização, mapa, push e validação: passos 4–7 e 14.
 3. Integração de entrada/saída e recuperação: passo 8.
-4. Gamificação, IA e indicadores: passos 9–11.
+4. Ranking de técnicos, IA e indicadores: passos 9–11.
 5. Validação e implantação documentada: passos 12–13.
 6. Diferenciais posteriores: offline completo, QR Code e voz. O monitoramento do passo 14 é P0 nas novas regras.
 
@@ -479,7 +481,7 @@ Todos os requisitos obrigatórios precisam ser demonstrados no conjunto final. E
 - [ ] Prioridade deriva de impacto/urgência; ausência de candidato e prazo excedido alertam administrador.
 - [ ] Chamado já assumido permite oferta de ajuda sem substituir responsável.
 - [ ] Falta de confirmação gera lembrete/alerta, sem resolução automática.
-- [ ] Ranking distingue pontos provisórios e confirmados; eventos repetidos não duplicam crédito.
+- [ ] Ranking mostra total acumulado por técnico em ordem decrescente; eventos repetidos não duplicam crédito.
 
 ## 8. Verificações e limites desta análise
 
@@ -537,7 +539,7 @@ Antes de implementar transições, explicitar o efeito da pausa/conclusão do re
 1. Cooperação aprovada em chamado já assumido, conforme critérios acima.
 2. Perfil editável e foto do técnico: persistência mockada, validação do arquivo e exibição no perfil/mapa; upload operacional futuro.
 3. Evidências do atendimento: anexar e consultar com autoria, horário, limites e acesso por perfil; preservar vínculo ao atendimento/histórico.
-4. Ranking e pontos: crédito provisório na conclusão e confirmado na validação; contribuição dos colaboradores e ajustes de reabertura explicáveis, auditáveis e sem duplicação; rankings individual/equipe por período, preservando histórico.
+4. Ranking e pontos: crédito na conclusão conforme dificuldade e prioridade; contribuição dos colaboradores a definir; histórico auditável e sem duplicação; classificação compartilhada na web e no app.
 
 Pesos, divisão de crédito, tratamento de ausência de confirmação e parâmetros operacionais continuam pendentes de definição. Estas etapas são planejadas, não funcionalidades concluídas. A sequência não remove requisitos futuros de backend, GPS/push reais, integração com legado e implantação, nem a divergência de IA: fora da interface nesta fase, embora exigida pelo manual para a entrega final.
 
@@ -564,24 +566,3 @@ Documento movido pelo usuário para a raiz do frontend e definido como referênc
 Cooperação ainda não implementada. Tempos independentes e conclusão global pelo responsável após todos encerrarem são recomendação, não decisão aprovada. Efeito de pausa/conclusão sobre colaboradores e autorização para encerrar entrega continuam pendentes.
 
 Revisão documental baseada no código, sem mudanças de implementação e sem novos testes de aplicação. Últimas verificações registradas: lint/build e roteiro de serviços aprovados; validação visual ainda pendente. Backend/mobile não auditados. Links do README passam a apontar para o plano na mesma pasta.
-
-
-## 11. Simplificação dos status do chamado — 09/10/2026
-
-Nova instrução do usuário: chamados têm somente **Em aberto, Em análise e Resolvido**. Regra comum para backend, web e mobile. Não usar Vinculado, Em andamento, Pausado, Bloqueado, Aguardando validação ou Aguardando análise como status públicos do chamado.
-
-| Acontecimento | Status do chamado | Informação interna do atendimento |
-|---|---|---|
-| Cadastro | Em aberto | Sem responsável; aguardando assunção/atribuição |
-| Assumir/atribuir | Em análise | Vinculado à fila; tempo ainda não iniciado |
-| Iniciar/retomar | Em análise | Execução ativa; cronômetro e posição |
-| Pausar/bloquear | Em análise | Execução interrompida com motivo, sem novas posições |
-| Concluir pelo técnico | Em análise | Entrega aguardando confirmação do solicitante |
-| Solicitar análise/devolver | Em análise, ou Em aberto se devolvido sem responsável | Pendência e encaminhamento preservados no histórico |
-| Confirmar pelo solicitante | Resolvido | Entrega confirmada e avaliação registrada |
-
-Mantida a confirmação do solicitante já adotada no produto; simplificar status não elimina permissões, tempos, pausa, impedimentos ou validação. Contrato do frontend separa status de executionState (etapa interna). Backend/mobile devem manter a mesma separação e validar a coerência dos dois campos.
-
-Migração: Aberto → Em aberto; Resolvido → Resolvido; demais status antigos → Em análise. A etapa original permanece em executionState; preservar IDs, vínculos, intervalos, histórico, posições, avisos e validações. Não descartar chamados existentes nem apagar armazenamento. Kanban passa a três colunas; filtros de status e indicadores usam apenas o catálogo novo. Detalhes exibem a etapa de execução para orientar ações.
-
-Trechos anteriores com estados antigos descrevem etapas internas ou histórico de entregas e não ampliam o catálogo vigente. Cooperação, perfis/fotos, evidências e ranking seguem pendentes. Validação desta mudança: lint, build e npm run check:statuses aprovados (migração dos oito estados, recarga, dados inválidos/falha de gravação, permissões, uma execução ativa, pausa/bloqueio, posições, conclusão, pendência, devolução e confirmação). Verificação visual em navegador/celular permanece pendente; build mantém aviso de bundle acima de 500 kB.
